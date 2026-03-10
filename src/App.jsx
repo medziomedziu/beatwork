@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Music } from 'lucide-react'
-import { AppProvider } from './context/AppContext'
-import { useApp } from './context/AppContext'
+import { AppProvider, useApp } from './context/AppContext'
+import LoginScreen from './components/LoginScreen'
 import Sidebar from './components/Sidebar'
 import Dashboard from './pages/Dashboard'
 import ModuleDetail from './pages/ModuleDetail'
@@ -11,24 +11,15 @@ function LoadingScreen() {
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        background: 'var(--bg)',
-        gap: 16,
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'center', minHeight: '100vh', background: 'var(--bg)', gap: 16,
       }}
     >
       <div
         style={{
-          width: 48,
-          height: 48,
+          width: 48, height: 48,
           background: 'linear-gradient(135deg, var(--primary), var(--primary-light))',
-          borderRadius: 'var(--r-sm)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          borderRadius: 'var(--r-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}
       >
         <Music style={{ color: '#fff', width: 22, height: 22 }} />
@@ -39,15 +30,12 @@ function LoadingScreen() {
       <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
         Loading your progress…
       </div>
-      {/* Subtle animated dots */}
       <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
         {[0, 1, 2].map((i) => (
           <div
             key={i}
             style={{
-              width: 6,
-              height: 6,
-              borderRadius: '50%',
+              width: 6, height: 6, borderRadius: '50%',
               background: 'var(--primary-light)',
               animation: `pulse-dot 1.4s ease-in-out ${i * 0.2}s infinite`,
             }}
@@ -59,8 +47,9 @@ function LoadingScreen() {
 }
 
 function AppShell() {
-  const { loading } = useApp()
+  const { auth, login, loading, role } = useApp()
 
+  if (!auth) return <LoginScreen onLogin={login} />
   if (loading) return <LoadingScreen />
 
   return (
@@ -70,7 +59,7 @@ function AppShell() {
         <Routes>
           <Route path="/"           element={<Dashboard />} />
           <Route path="/module/:id" element={<ModuleDetail />} />
-          <Route path="/teacher"    element={<TeacherInbox />} />
+          <Route path="/teacher"    element={role === 'teacher' ? <TeacherInbox /> : <Navigate to="/" replace />} />
           <Route path="/progress"   element={<Navigate to="/" replace />} />
           <Route path="/qa"         element={<Navigate to="/" replace />} />
           <Route path="*"           element={<Navigate to="/" replace />} />
